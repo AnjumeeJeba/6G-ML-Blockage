@@ -42,7 +42,29 @@ HAPPY_COLORS_PALETTE = ["#01BEFE", "#FFDD00", "#FF7D00", "#FF006D", "#ADFF02", "
 sns.set_palette(sns.color_palette(HAPPY_COLORS_PALETTE))
 ```
 **sns.set():** Customizes the appearance of Seaborn plots with:
+
  ```whitegrid:``` Adds a grid background to plots.
  ```palette='muted':```Sets muted colors as the default palette.
  ```font_scale=1.2:``` Scales up font sizes in plots for better readability.
+ 
 **HAPPY_COLORS_PALETTE:** A custom color palette. These colors will be applied to the plots.
+
+### 4. rcParams for Plot Size
+```python
+rcParams['figure.figsize'] = 12, 8
+```
+Configures the default size of all plots to be 12 inches wide and 8 inches tall.
+
+### 5. Setting Random Seed
+```python
+RANDOM_SEED = 42
+np.random.seed(RANDOM_SEED)
+torch.manual_seed(RANDOM_SEED)
+```
+**RANDOM_SEED = 42:** A fixed value for reproducibility. Ensures that results remain consistent across runs.
+
+**np.random.seed():** Seeds the random number generator for NumPy operations.
+
+**torch.manual_seed():** Seeds PyTorch's random number generator.
+
+This ensures deterministic results during training and data preprocessing.
