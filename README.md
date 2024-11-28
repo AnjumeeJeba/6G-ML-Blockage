@@ -34,3 +34,15 @@ import torch.nn.functional as F
 ```
 ```%matplotlib inline:``` Ensures that matplotlib plots are displayed directly inside the Jupyter notebook.
 ```%config InlineBackend.figure_format = 'retina':``` Makes plots rendered in a higher resolution for better clarity.
+
+### 3. Seaborn Plot Style and Palette
+```python
+sns.set(style='whitegrid', palette='muted', font_scale=1.2)
+HAPPY_COLORS_PALETTE = ["#01BEFE", "#FFDD00", "#FF7D00", "#FF006D", "#ADFF02", "#8F00FF"]
+sns.set_palette(sns.color_palette(HAPPY_COLORS_PALETTE))
+```
+**sns.set():** Customizes the appearance of Seaborn plots with:
+ ```whitegrid:``` Adds a grid background to plots.
+ ```palette='muted':```Sets muted colors as the default palette.
+ ```font_scale=1.2:``` Scales up font sizes in plots for better readability.
+**HAPPY_COLORS_PALETTE:** A custom color palette. These colors will be applied to the plots.
