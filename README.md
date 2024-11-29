@@ -88,3 +88,29 @@ with open('Test30%alloriginal.arff', 'r') as f:
 ```
 - The ```arff``` library is being used to read ARFF files, which are typically structured data files used in machine learning (e.g., WEKA datasets).
 - ```arff.load(f)``` reads and parses the contents of the ARFF file into Python objects.
+
+### 8.Extracting Data and Attributes
+```python
+train_data = train_dataset['data']
+train_attributes = train_dataset['attributes']
+
+test_data = test_dataset['data']
+test_attributes = test_dataset['attributes']
+```
+The ARFF file is a dictionary-like structure with keys like ```data``` and ```attributes```:
+```data```: Contains the actual dataset rows (features and labels).
+```attributes```: Describes the column names and types in the dataset (e.g., features and labels).
+**Printing Data**
+Print the first 14 rows of the training data
+```python
+for row in train_data[:14]:
+    print(row)
+```
+This loop iterates through the first 14 rows of the training data and prints them. From the screenshots, we can see that:
+Each row contains numeric values corresponding to the features of a trace.
+The last value in each row is a label:
+1 indicates oscillation.
+2 indicates non-block.
+
+### 9. Loading ARFF Files
+
