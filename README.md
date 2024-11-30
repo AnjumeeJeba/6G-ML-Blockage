@@ -113,4 +113,214 @@ The last value in each row is a label:
 2 indicates non-block.
 
 ### 9. Loading ARFF Files
+1. Function ```load_arff_to_dataframe```
+- Reads an ARFF file using the ```arff module```.
+- Extracts the ```attributes``` (column names) and ```data``` (rows) from the 
+  ARFF file.
+- Converts these into a Pandas DataFrame, with attribute names as column headers.
+- Optionally ensures the target column (e.g., "Target") is treated as a   
+  categorical variable, which is useful for classification tasks.
 
+
+```python
+attribute_names = [attr[0] for attr in dataset['attributes']]
+```
+Extracts column names from the ```attributes``` field of the ARFF file.
+```python
+data = [list(row) for row in dataset['data']]
+```
+Converts the rows into a list of lists, making them compatible with Pandas
+
+```python
+df = pd.DataFrame(data, columns=attribute_names)
+```
+Creates a DataFrame with extracted column names and data
+
+```python
+print(train.head())
+print(test.head())
+```
+Displays the first 5 rows of both datasets.
+
+### 10. Dataframe Visualization
+```pthon
+# Concatenate train and test DataFrames
+df = pd.concat([train, test])
+
+# Shuffle the DataFrame (shuffle rows randomly)
+df = df.sample(frac=1.0)
+
+# Check the shape of the combined and shuffled DataFrame
+print(df.shape)
+```
+- ```pd.concat([train, test])```: This combines train and test vertically (row- 
+  wise).
+- ```.sample(frac=1.0)```: Shuffles all rows randomly while keeping all data 
+  (frac=1.0 means 100% of rows are sampled).
+- ```df.shape```: Displays the shape of the resulting DataFrame.
+
+**Output**: (480, 1501)
+
+This means the train and test DataFrames combined have 480 rows and 1501 columns, which matches expectations based on our dataset structure.
+
+```python
+# Concatenate train and test DataFrames
+df = pd.concat([test])
+
+# Shuffle the DataFrame (shuffle rows randomly)
+df = df.sample(frac=1.0)
+
+# Check the shape of the combined and shuffled DataFrame
+print(df.shape)
+```
+- ```pd.concat([test])```: Only includes test (no actual concatenation because 
+  test is the sole DataFrame).
+- ```.sample(frac=1.0)```: Shuffles the rows in the test DataFrame.
+- ```df.shape```: Displays the shape of the resulting DataFrame.
+
+**Output**: (144, 1501)
+
+This reflects that the test DataFrame alone has 144 rows and 1501 columns, consistent with our dataset structure.
+
+```python
+# Concatenate train and test DataFrames
+df = pd.concat([train])
+
+# Shuffle the DataFrame (shuffle rows randomly)
+df = df.sample(frac=1.0)
+
+# Check the shape of the combined and shuffled DataFrame
+print(df.shape)
+```
+This reflects that the train DataFrame alone has 336 rows and 1501 columns, consistent with our dataset structure again.
+
+```python
+print(f"Train shape: {train.shape}")  
+print(f"Test shape: {test.shape}")    
+
+# Concatenate train and test DataFrames
+df = pd.concat([train, test], axis=0)  
+
+# Shuffle the combined DataFrame (randomizes the row order)
+df = df.sample(frac=1.0, random_state=42)  
+
+# Check the shape of the concatenated and shuffled DataFrame
+print(f"Combined DataFrame shape: {df.shape}")  
+
+# Display the first 5 rows of the shuffled DataFrame
+print(df.head())
+```
+Check the shapes of train and test to verify they match the expected dimensions
+Train shape: (336, 1501)
+Test shape: (144, 1501)
+Combined DataFrame shape: (480, 1501)
+
+### 11. Definition of classes
+
+```python
+CLASS_OSCILLATION = 1
+
+class_names = ['Oscillation','Nonblocked']
+```
+```CLASS_OSCILLATION = 1```:
+
+A constant is defined to represent the "Oscillation" class with a value of 1. This is useful if you want to refer to the class in your code later without hardcoding the number.
+
+```class_names = ['Oscillation', 'Nonblocked']```:
+
+A list of class names is defined. These are human-readable labels for the numeric target values (1 and 2). They are used to make the plot more interpretable.
+
+```python
+new_columns = list(df.columns)
+new_columns[-1] = 'target'
+df.columns = new_columns
+```
+This renames the last column of your DataFrame to ```target```, which is presumably the column containing the class labels (1 or 2).
+
+```print(df.target.value_counts())``` this  method counts the occurrences of each unique value in the target column.
+
+```
+target
+2    240
+1    239
+Name: count, dtype: int64
+```
+There are 240 examples of class 2 (Nonblocked) and 239 examples of class 1 (Oscillation).
+
+```python
+ax = sns.countplot(df.target)
+ax.set_xticklabels(class_names);
+```
+This creates a bar plot using Seaborn. Each bar represents the count of rows for a particular class (1 or 2) in the target column.
+
+### 12. Time Series Class Plotting Function
+The ```plot_time_series_class``` function plots a time series for a given class, with a smoothed version of the series (rolling mean) and a shaded region that represents the variability (confidence interval) around the smoothed curve.
+```python
+def plot_time_series_class(data, class_name, ax, n_steps=10):
+```
+```data```: A single time-series sequence (e.g., one row or column from your 
+            dataset). This represents a specific example of the time-series 
+            values for one class (e.g., Oscillation).
+```class_name```: The name of the class being plotted, such as "Oscillation" or 
+                  "Nonblocked". This will be used to label the plot.
+```ax```: The matplotlib Axes object where the plot will be drawn.
+```n_steps```: The number of steps for the rolling window. This determines how 
+               smooth the rolling average and standard deviation will appear.
+
+
+  ```python
+time_series_df = pd.DataFrame(data)
+```
+Converts the input time series into a DataFrame, making it easier to calculate rolling statistics. For example, if you pass a row of time-series data for "Oscillation," this step creates a structured DataFrame with one column containing the series.
+Example from our dataset: If our row for "Oscillation" looks like this:
+```css
+[-52.062580, -52.060561, -52.058553, ..., -52.322579]
+```
+```time_series_df``` will look like:
+```python
+       0
+0 -52.062580
+1 -52.060561
+2 -52.058553
+...
+```
+```python
+smooth_path = time_series_df.rolling(n_steps).mean()
+```
+Computes the rolling mean over ```n_steps```. This smooths the raw time-series data, reducing noise and revealing trends in "Oscillation" or "Nonblocked."
+Example: With ```n_steps=10```, each value in the smoothed series is the average of the preceding 10 values. This helps us to see the trend more clearly.
+
+```python
+path_deviation = 2 * time_series_df.rolling(n_steps).std()
+```
+Calculates the rolling standard deviation over ```n_steps``` and multiplies it by 2. This quantifies variability in the time series and is used to create a confidence interval.
+Example: If the rolling standard deviation is 0.5, then ```path_deviation``` will be 1.0. The confidence interval will extend ±1.0 from the smoothed line.
+
+```python
+under_line = (smooth_path - path_deviation)[0]
+over_line = (smooth_path + path_deviation)[0]
+```
+Computes the lower (```under_line```) and upper (```over_line```) bounds of the confidence interval by subtracting or adding ```path_deviation``` from/to the smoothed series.
+**For Oscillation**:
+```under_line``` might represent the minimum expected oscillation values over time.
+```over_line``` might represent the maximum expected oscillation values over time.
+
+```python
+ax.plot(smooth_path, linewidth=2)
+```
+Plots the smoothed time series as a line on the graph. This gives a clean view of the overall trend in the data.
+
+```python
+ax.fill_between(
+    path_deviation.index,
+    under_line,
+    over_line,
+    alpha=.125
+)
+ax.set_title(class_name)
+```
+- Fills the region between ```under_line``` and ```over_line``` to visualize the variability (or confidence interval) around 
+  the smoothed series. For Oscillation: This shaded area shows how much the oscillation values deviate from the trend.
+- Sets the title of the plot to the class name (e.g., "Oscillation" or "Nonblocked"). This helps identify which class the time 
+  series belongs to.
+  
